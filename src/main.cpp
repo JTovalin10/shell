@@ -25,7 +25,7 @@ void complete_operation(const std::string& user_input) noexcept {
     if (is_type) {
       std::cout << user_input.substr(5) << " is a shell builtin";
     } else {
-      std::cout << user_input << ": not found";
+      std::cout << user_input.substr(5) << ": not found";
     }
   } else {
     std::cout << user_input << ": command not found";
