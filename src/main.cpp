@@ -21,7 +21,7 @@ void complete_operation(const std::string& user_input) noexcept {
   const bool geq_4 = user_input.size() >= 4;
   if (geq_4 && user_input.substr(0, 4) == "echo") {
     std::cout << user_input.substr(5);
-  } else if (geq_4 && user.substr(0, 4) == "type") {
+  } else if (geq_4 && user_input.substr(0, 4) == "type") {
     const bool is_type = is_input_shell_type(user_input.substr(5));
     if (is_type) {
       std::cout << user_input.substr(0, 4) << " is a shell builtin";
