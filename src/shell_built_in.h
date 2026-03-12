@@ -18,7 +18,7 @@ class shell_hash_set {
   shell_hash_set& operator=(shell_hash_set&& other) = default;
 
   bool contains(const std::string& other) noexcept {
-    return set.find(other);
+    return set.find(other) != set.end();
   }
   private:
   std::unordered_set<std::string> set;
