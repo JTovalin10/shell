@@ -12,9 +12,6 @@ int main() {
     if (user_input.size() >= 0) {
       std::cout << user_input + ": command not found";
     }
-    user_input.clear()
+    user_input.clear();
   }
-  std::cout << "$ ";
-  std::string user_input;
-
 }
