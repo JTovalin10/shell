@@ -3,11 +3,10 @@
 
 
 bool is_input_shell_type(const std::string& input) noexcept {
-  switch (input) {
-    case "echo":  return true;
-    case "break": return true;
-    default: return false;
+  if (input == "echo" || input == "exit") {
+    return true;
   }
+  return false;
 }
 
 /**
