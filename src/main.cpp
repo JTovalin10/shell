@@ -1,6 +1,15 @@
 #include <iostream>
 #include <string>
 
+void complete_operation(const std::string& user_input) noexcept {
+  // check if is echo
+  if (user_input.size() > 4) {
+    std::cout << "Inside echo";
+  } else {
+    std::cout << user_input + ": command not found";
+  }
+}
+
 int main() {
   // Flush after every std::cout / std:cerr
   std::cout << std::unitbuf;
@@ -18,11 +27,3 @@ int main() {
   }
 }
 
-void complete_operation(const std::string& user_input) noexcept {
-  // check if is echo
-  if (user_input.size() > 4) {
-    std::cout << "Inside echo";
-  } else {
-    std::cout << user_input + ": command not found";
-  }
-}
