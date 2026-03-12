@@ -10,7 +10,7 @@ int main() {
     std::cout << "$ ";
     std::cin >> user_input;
     if (user_input.size() >= 0) {
-      std::cout << user_input + ": command not found";
+      std::cout << user_input + ": command not found" << std::endl;
     }
     user_input.clear();
   }
