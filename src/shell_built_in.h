@@ -6,9 +6,9 @@
 class shell_hash_set {
   public:
   shell_hash_set() {
-   set.add("echo");
-   set.add("type");
-   set.add("exit");
+   set.insert("echo");
+   set.insert("type");
+   set.insert("exit");
   }
 
   ~shell_hash_set = default;
