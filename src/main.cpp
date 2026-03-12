@@ -7,4 +7,9 @@ int main() {
   std::cerr << std::unitbuf;
 
   std::cout << "$ ";
+  std::string user_input;
+  std::cin >> user_input;
+  if (user_input) {
+    std::cout << user_input + ": Command not found"
+  }
 }
