@@ -1,8 +1,11 @@
 #include <cstdlib>
 #include <iostream>
+#include <ranges>
 #include <string>
+#include <vector>
 
-#include "filesys.hpp"
+#include "FileSys/FileSys.hpp"
+#include "ShellHelper/ShellHelper.hpp"
 
 /**
  * Helper function that completes all other operations that are not exit
@@ -31,11 +34,16 @@ int main() {
   while (true) {
     std::cout << "$ ";
     // use get line to get the entire line
-    std::getline(std::cin, user_input);
+    if (!std::getline(std::cin, user_input)) {
+      break;
+    }
+    if (user_input.empty()) {
+      continue;
+    }
     if (user_input == "exit") {
       break;
     }
     complete_operation(user_input);
-    user_input.clear();
   }
+  return 0;
 }

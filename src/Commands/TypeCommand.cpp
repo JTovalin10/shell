@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#include "../filesys.hpp"
+#include "../FileSys/FileSys.hpp"
 #include "BuiltInCommand.hpp"
 
 class TypeCommand : public BuiltInCommand {
