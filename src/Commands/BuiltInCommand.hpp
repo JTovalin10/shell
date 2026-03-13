@@ -9,7 +9,7 @@
 class BuiltInCommand {
  public:
   virtual ~BuiltInCommand() = default;
-  virtual std::string Name() = 0;
+  virtual std::string Name() const = 0;
   virtual void Execute(const std::vector<std::string>& args) = 0;
 };
 
@@ -18,7 +18,8 @@ using CommandFunc = std::function<void(const std::vector<std::string>&)>;
 class CommandRegistry {
  public:
   static void Add(std::unique_ptr<BuiltInCommand> cmd) {
-    GetMap()[cmd->Name()] = std::move(cmd);
+    std::string name = cmd->Name();
+    GetMap()[name] = std::move(cmd);
   }
 
   static bool Run(const std::string& name,

@@ -1,5 +1,3 @@
-#pragma once
-
 #include <filesystem>
 #include <iostream>
 
@@ -9,7 +7,7 @@ namespace fs = std::filesystem;
 
 class PwdCommand : public BuiltInCommand {
  public:
-  std::string Name() override { return "pwd"; }
+  std::string Name() const override { return "pwd"; }
 
   void Execute(const std::vector<std::string>& args) override {
     fs::path currentPath = fs::current_path();
@@ -18,6 +16,6 @@ class PwdCommand : public BuiltInCommand {
 };
 
 static bool pwd_registry = []() {
-  CommandRegistry::Add(std::unique_ptr<PwdCommand>());
+  CommandRegistry::Add(std::make_unique<PwdCommand>());
   return true;
 }();

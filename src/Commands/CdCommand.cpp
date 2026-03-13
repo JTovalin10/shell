@@ -1,5 +1,3 @@
-#pragma once
-
 #include <filesystem>
 #include <iostream>
 
@@ -9,7 +7,7 @@ namespace fs = std::filesystem;
 
 class CdCommand : public BuiltInCommand {
  public:
-  std::string Name() override { return "cd"; }
+  std::string Name() const override { return "cd"; }
 
   void Execute(const std::vector<std::string>& args) override {
     std::string desired_path = args[1];

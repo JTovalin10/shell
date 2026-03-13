@@ -8,75 +8,74 @@
 #include <string_view>
 #include <vector>
 
-#include "BuiltInCommand.hpp"
+#include "Commands/BuiltInCommand.hpp"
 
 namespace fs = std::filesystem;
 
 namespace Slime {
 
-void execute_shell_command(std::vector<std::string> inputs) {
+inline void execute_shell_command(const std::vector<std::string>& inputs) {
   CommandRegistry::Run(inputs[0], inputs);
 }
 
-void execute_non_shell_command(const std::string& command,
-                               std::vector<std::string> inputs) {
+inline void execute_non_shell_command(const std::string &command,
+                                      const std::vector<std::string> &inputs) {
   // executes the command
   std::string full_argument = command;
-  for (int i = 1; i < inputs.size(); ++i) {
+  for (size_t i = 1; i < inputs.size(); ++i) {
     full_argument += " " + inputs[i];
   }
-  int system = std::system(full_argument.c_str());
+  (void)std::system(full_argument.c_str());
 }
 
-std::vector<std::string> get_directories(const char* char_path) {
+inline std::vector<std::string> get_directories(const char *char_path) {
+  if (!char_path)
+    return {};
   std::string_view path(char_path);
   std::vector<std::string> result;
 
-  for (auto&& word : path | std::views::split(':')) {
+  for (auto &&word : path | std::views::split(':')) {
     result.emplace_back(word.begin(), word.end());
   }
   return result;
 }
 
-bool check_file_permission_status(const fs::path& path) {
+inline bool check_file_permission_status(const fs::path &path) {
   auto status = fs::status(path);
   auto permissions = status.permissions();
-  // if ((permissions & fs::perms::owner_write) != fs::perms::none) return
-  // false; if ((permissions & fs::perms::owner_read) != fs::perms::none)
-  // return false;
-  if ((permissions & fs::perms::owner_exec) != fs::perms::none) return true;
-  return false;
+  return (permissions & fs::perms::owner_exec) != fs::perms::none;
 }
 
-std::string find_in_path(const std::string& command, const char* path) {
+inline std::string find_in_path(const std::string &command, const char *path) {
   if (!path) {
     return "";
   }
-  std::vector<std::string> directories = std::move(get_directories(path));
+  std::vector<std::string> directories = get_directories(path);
 
-  for (const auto& dir : directories) {
+  for (const auto &dir : directories) {
     fs::path full_path = fs::path(dir) / command;
     if (fs::exists(full_path)) {
-      if (check_file_permission_status(full_path) == false) continue;
+      if (!check_file_permission_status(full_path))
+        continue;
       return full_path.string();
     }
   }
   return "";
 }
 
-bool is_executable(const std::string& command, const char* path) {
-  std::string&& full_path = std::move(find_in_path(command, path));
-  return full_path.size() > 0;
+inline bool is_executable(const std::string &command, const char *path) {
+  std::string full_path = find_in_path(command, path);
+  return !full_path.empty();
 }
 
-bool is_input_shell_type(const std::string& input) noexcept {
-  CommandRegistry::IsBuiltIn(input);
+inline bool is_input_shell_type(const std::string &input) noexcept {
+  return CommandRegistry::IsBuiltIn(input);
 }
 
-const std::string& find_in_file_system(std::string& command) noexcept {
-  char* path = std::getenv("PATH");
+inline std::string find_in_file_system(const std::string &command) noexcept {
+  char *path = std::getenv("PATH");
   // base case
   return find_in_path(command, path);
 }
 
-}  // namespace Slime
+} // namespace Slime

@@ -4,24 +4,6 @@
 
 #include "filesys.hpp"
 
-void print_type(const std::string& input) noexcept {
-  std::string type = input.substr(5);
-  const bool is_type = Slime::is_input_shell_type(type);
-  if (is_type) {
-    std::cout << type << " is a shell builtin";
-    return;
-  }
-  // check if it is within our file system
-  const std::string& path = Slime::find_in_file_system(type);
-
-  if (path.size() > 0) {
-    std::cout << type << " is " << path;
-    return;
-  }
-  // base case
-  std::cout << type << ": not found";
-}
-
 /**
  * Helper function that completes all other operations that are not exit
  *

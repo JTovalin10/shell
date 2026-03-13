@@ -1,5 +1,3 @@
-#pragma once
-
 #include <iostream>
 #include <memory>
 #include <string>
@@ -9,10 +7,17 @@
 
 class EchoCommand : public BuiltInCommand {
  public:
-  std::string Name() override { return "echo"; }
+  std::string Name() const override { return "echo"; }
 
   void Execute(const std::vector<std::string>& args) override {
-    std::cout << args.at(0).size() << "\n";
+    int i = 1;
+    for (i = 1; i < args.size() - 1; ++i) {
+      std::cout << args[i] << " ";
+    }
+    if (i < args.size()) {
+      std::cout << args[i];
+    }
+    std::cout << std::endl;
   }
 };
 
