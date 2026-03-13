@@ -5,7 +5,7 @@
 #include <string>
 
 bool is_input_shell_type(const std::string &input) noexcept {
-  static shell_hash_set set{};
+  static Slime::shell_hash_set set{};
   return set.contains(input);
 }
 
@@ -40,14 +40,19 @@ void print_type(const std::string &input) noexcept {
  * user_input - string that contains the user input
  */
 void complete_operation(const std::string &user_input) noexcept {
-  // check if is echo
-  const bool geq_4 = user_input.size() >= 4;
-  if (geq_4 && user_input.substr(0, 4) == "echo") {
-    std::cout << user_input.substr(5);
-  } else if (geq_4 && user_input.substr(0, 4) == "type") {
+  std::vector<std::string> inputs = user_input | std::views::split(' ') |
+                                    std::ranges::to<std::vector<std::string>>();
+  std::string command = inputs[0];
+  if (command == "echo") {
+    // length of command + blank space
+    std::cout << user_input.substr(command.length() + 1) << "\n";
+  } else if (command == "type") {
     print_type(user_input);
+    std::cout << "\n";
+  } else if (Slime::is_executable(command, std::getenv("PATH"))) {
+    Slime::execute_command(command, inputs);
   } else {
-    std::cout << user_input << ": command not found";
+    std::cout << user_input << ": command not found\n";
   }
 }
 
@@ -64,7 +69,6 @@ int main() {
       break;
     }
     complete_operation(user_input);
-    std::cout << std::endl;
     user_input.clear();
   }
 }
