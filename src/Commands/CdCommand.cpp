@@ -11,6 +11,8 @@ class CdCommand : public BuiltInCommand {
 
   void Execute(const std::vector<std::string>& args) override {
     std::string desired_path = args[1];
+    // edge case where its "~"
+    if (desired_path == "~") desired_path = std::getenv("HOME");
     if (fs::exists(desired_path) && fs::is_directory(desired_path)) {
       try {
         fs::current_path(desired_path);
