@@ -40,6 +40,8 @@ void complete_operation(const std::string& user_input) noexcept {
     std::cout << "\n";
   } else if (command == "pwd") {
     Slime::print_working_directory();
+  } else if (command == "cd") {
+    Slime::change_directory(inputs[1]);
   } else if (Slime::is_executable(command, std::getenv("PATH"))) {
     Slime::execute_command(command, inputs);
   } else {

@@ -12,6 +12,7 @@ class shell_hash_set {
     set.insert("type");
     set.insert("exit");
     set.insert("pwd");
+    set.insert("cd");
   }
 
   ~shell_hash_set() = default;
