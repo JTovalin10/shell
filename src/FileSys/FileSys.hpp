@@ -6,6 +6,8 @@
 #include <ranges>
 #include <string>
 #include <string_view>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <vector>
 
 namespace fs = std::filesystem;
@@ -23,7 +25,7 @@ bool check_file_permission_status(const fs::path& path);
 
 std::string find_in_path(const std::string& command, const char* path);
 
-bool is_executable(const std::string& command, const char* path);
+bool is_executable(const std::string& command);
 
 std::string find_in_file_system(const std::string& command) noexcept;
 

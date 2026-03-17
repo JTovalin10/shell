@@ -1,7 +1,5 @@
 #include "FileSys.hpp"
 
-#include <ranges>
-
 #include "Commands/BuiltInCommand.hpp"
 
 namespace Slime {
@@ -12,12 +10,23 @@ void execute_shell_command(const std::vector<std::string>& inputs) {
 
 void execute_non_shell_command(const std::string& command,
                                const std::vector<std::string>& inputs) {
-  // executes the command
-  std::string full_argument = command;
-  for (size_t i = 1; i < inputs.size(); ++i) {
-    full_argument += " " + inputs[i];
+  pid_t pid = fork();
+  // we already parsed inputs and cleaned it so we have to use this so the
+  // library doesnt attempt to parse it again
+  if (pid == 0) {
+    // child process
+    std::vector<char*> argv;
+    argv.reserve(inputs.size());
+    for (const auto& s : inputs) {
+      argv.push_back(const_cast<char*>(s.c_str()));
+    }
+    argv.push_back(nullptr);
+    execvp(command.c_str(), argv.data());
+  } else {
+    // parent thread
+    int status;
+    waitpid(pid, &status, 0);
   }
-  (void)std::system(full_argument.c_str());
 }
 
 std::vector<std::string> get_directories(const char* char_path) {
@@ -53,7 +62,8 @@ std::string find_in_path(const std::string& command, const char* path) {
   return "";
 }
 
-bool is_executable(const std::string& command, const char* path) {
+bool is_executable(const std::string& command) {
+  const char* path = std::getenv("PATH");
   std::string full_path = find_in_path(command, path);
   return !full_path.empty();
 }
