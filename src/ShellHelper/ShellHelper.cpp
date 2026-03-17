@@ -39,6 +39,8 @@ std::vector<std::string> parse_args(const std::string& user_args) {
       case STATE::SINGLE_QUOTE:
         if (curr == squote) {
           state = STATE::NORMAL;
+        } else if (curr == bslash) {
+          break;
         } else {
           scurr += curr;
         }
@@ -46,6 +48,8 @@ std::vector<std::string> parse_args(const std::string& user_args) {
       case STATE::DOUBLE_QUOTE:
         if (curr == dquote) {
           state = STATE::NORMAL;
+        } else if (curr = bslash) {
+          break;
         } else {
           scurr += curr;
         }
