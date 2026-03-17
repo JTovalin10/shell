@@ -48,8 +48,12 @@ std::vector<std::string> parse_args(const std::string& user_args) {
           state = STATE::NORMAL;
         } else if (curr = bslash && i + 1 < size) {
           char next = user_args[i + 1];
-          scurr += next;
-          ++i;
+          if (next == dquote || next == bslash) {
+            scurr += next;
+            ++i;
+          } else {
+            scurr += curr;
+          }
         } else {
           scurr += curr;
         }
