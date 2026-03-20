@@ -13,13 +13,13 @@
  * ARGS:
  * user_input - string that contains the user input
  */
-void complete_operation(const std::string& user_input) noexcept {
+void complete_operation(const std::string &user_input) noexcept {
   std::vector<std::string> inputs = Slime::parse_args(user_input);
   std::string command = inputs[0];
   if (Slime::is_input_shell_type(command)) {
-    Slime::execute_shell_command(inputs);
+    Slime::execb(inputs);
   } else if (Slime::is_executable(command)) {
-    Slime::execute_non_shell_command(command, inputs);
+    Slime::execnb(inputs);
   } else {
     std::cout << user_input << ": command not found\n";
   }
