@@ -5,6 +5,11 @@
 
 namespace Slime {
 
+struct RedirectInfo {
+  std::string stdout_file;
+  std::string stderr_file;
+};
+
 /**
  * parsed the args to check for quoting and changes the args accordingly
  *
@@ -27,7 +32,7 @@ std::vector<std::string> parse_args(const std::string& user_args);
  * std::string which represents the command
  * ex: ls > ex.txt hello -> ls
  */
-std::string find_redirect(std::vector<std::string>& args);
+RedirectInfo find_redirect(std::vector<std::string>& args);
 
 /**
  * Checks if the input/command is a built in

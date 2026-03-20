@@ -1,5 +1,6 @@
 #include "ShellHelper.hpp"
 
+#include <algorithm>
 #include <cstddef>
 
 #include "Commands/BuiltInCommand.hpp"
@@ -79,21 +80,28 @@ std::vector<std::string> parse_args(const std::string& user_args) {
  *
  * example: ls > example.txt hello -> ls hello > example.txt
  */
-std::string find_redirect(std::vector<std::string>& args) {
-  std::string file{};
-  // removes i and i + 1
-  int index_to_remove{-1};
+RedirectInfo find_redirect(std::vector<std::string>& args) {
+  RedirectInfo info;
+  int stdout_idx{-1};
+  int stderr_idx{-1};
   for (size_t i{}; i < args.size(); ++i) {
     if ((args[i] == ">" || args[i] == "1>") && i + 1 < args.size()) {
-      file = args[i + 1];
-      index_to_remove = i;
+      info.stdout_file = args[i + 1];
+      stdout_idx = i;
+    } else if (args[i] == "2>" && i + 1 < args.size()) {
+      info.stderr_file = args[i + 1];
+      stderr_idx = i;
     }
   }
-  if (index_to_remove != -1) {
-    args.erase(args.begin() + index_to_remove,
-               args.begin() + index_to_remove + 2);
+  std::vector<int> to_remove{};
+  if (stdout_idx != -1) to_remove.push_back(stdout_idx);
+  if (stderr_idx != -1) to_remove.push_back(stderr_idx);
+  // we want to reverse from the back to front to avoid shifting issues
+  std::sort(to_remove.rbegin(), to_remove.rend());
+  for (const int& i : to_remove) {
+    args.erase(args.begin() + i, args.begin() + i + 2);
   }
-  return file;
+  return info;
 }
 
 bool is_built_in(const std::string& command) noexcept {
