@@ -7,10 +7,15 @@
 
 enum class STATE { NORMAL, SINGLE_QUOTE, DOUBLE_QUOTE, BACKSLASH };
 
-static constexpr char squote = '\'';
-static constexpr char dquote = '"';
-static constexpr char bslash = '\\';
-static constexpr char space = ' ';
+static constexpr char SQUOTE = '\'';
+static constexpr char DQUOTE = '"';
+static constexpr char BSLASH = '\\';
+static constexpr char SPACE = ' ';
+
+static constexpr int STDOUT_IDX{0};
+static constexpr int STDOUT_APPEND_IDX{1};
+static constexpr int STDERR_IDX{2};
+static constexpr int STDERR_APPEND_IDX{3};
 
 namespace Slime {
 std::vector<std::string> parse_args(const std::string& user_args) {
@@ -24,13 +29,13 @@ std::vector<std::string> parse_args(const std::string& user_args) {
     char curr = user_args[i];
     switch (state) {
       case STATE::NORMAL:
-        if (curr == squote) {
+        if (curr == SQUOTE) {
           state = STATE::SINGLE_QUOTE;
-        } else if (curr == dquote) {
+        } else if (curr == DQUOTE) {
           state = STATE::DOUBLE_QUOTE;
-        } else if (curr == bslash) {
+        } else if (curr == BSLASH) {
           state = STATE::BACKSLASH;
-        } else if (curr == space) {
+        } else if (curr == SPACE) {
           if (!scurr.empty()) {
             parsed_args.push_back(scurr);
             scurr.clear();
@@ -40,18 +45,18 @@ std::vector<std::string> parse_args(const std::string& user_args) {
         }
         break;
       case STATE::SINGLE_QUOTE:
-        if (curr == squote) {
+        if (curr == SQUOTE) {
           state = STATE::NORMAL;
         } else {
           scurr += curr;
         }
         break;
       case STATE::DOUBLE_QUOTE:
-        if (curr == dquote) {
+        if (curr == DQUOTE) {
           state = STATE::NORMAL;
-        } else if (curr == bslash && i + 1 < size) {
+        } else if (curr == BSLASH && i + 1 < size) {
           char next = user_args[i + 1];
-          if (next == dquote || next == bslash) {
+          if (next == DQUOTE || next == BSLASH) {
             scurr += next;
             ++i;
           } else {
@@ -82,23 +87,24 @@ std::vector<std::string> parse_args(const std::string& user_args) {
  */
 RedirectInfo find_redirect(std::vector<std::string>& args) {
   RedirectInfo info;
-  int stdout_idx{-1};
-  int stderr_idx{-1};
+  std::vector<int> to_remove(4, -1);
   for (size_t i{}; i < args.size(); ++i) {
-    if ((args[i] == ">" || args[i] == "1>") && i + 1 < args.size()) {
+    const bool inbound = i + 1 < args.size();
+    if ((args[i] == ">" || args[i] == "1>") && inbound) {
       info.stdout_file = args[i + 1];
-      stdout_idx = i;
-    } else if (args[i] == "2>" && i + 1 < args.size()) {
+      to_remove[STDOUT_IDX] = i;
+    } else if (args[i] == ">>" && inbound) {
+      info.stdout_append_file = args[i + 1];
+      to_remove[STDOUT_APPEND_IDX] = i;
+    } else if (args[i] == "2>" && inbound) {
       info.stderr_file = args[i + 1];
-      stderr_idx = i;
+      to_remove[STDERR_IDX] = i;
     }
   }
-  std::vector<int> to_remove{};
-  if (stdout_idx != -1) to_remove.push_back(stdout_idx);
-  if (stderr_idx != -1) to_remove.push_back(stderr_idx);
   // we want to reverse from the back to front to avoid shifting issues
   std::sort(to_remove.rbegin(), to_remove.rend());
   for (const int& i : to_remove) {
+    if (i == -1) continue;
     args.erase(args.begin() + i, args.begin() + i + 2);
   }
   return info;
@@ -108,4 +114,4 @@ bool is_built_in(const std::string& command) noexcept {
   return CommandRegistry::IsBuiltIn(command);
 }
 
-}  // namespace Slime
+}  // nameSPACE Slime

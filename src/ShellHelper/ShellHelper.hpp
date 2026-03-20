@@ -7,7 +7,9 @@ namespace Slime {
 
 struct RedirectInfo {
   std::string stdout_file;
+  std::string stderr_append_file;
   std::string stderr_file;
+  std::string stdout_append_file;
 };
 
 /**

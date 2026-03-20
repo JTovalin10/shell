@@ -21,6 +21,12 @@ static void redirect_stdout(const std::string& file) {
   close(fd);
 }
 
+static void append_stdout(const std::string& file) {
+  int fd = open(file.c_str(), O_WRONLY | O_APPEND | O_CREAT, 0644);
+  dup2(fd, STDOUT_FILENO);
+  close(fd);
+}
+
 static void redirect_stderr(const std::string& file) {
   int fd = open(file.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644);
   dup2(fd, STDERR_FILENO);
