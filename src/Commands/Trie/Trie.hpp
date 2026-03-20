@@ -52,7 +52,7 @@ class Trie {
    * returns the finished word, or ''
    * ex: ec -> echo
    */
-  std::string autocomplete(const char* word);
+  std::vector<std::string> autocomplete(const char* word);
 
  private:
   TrieNode root;

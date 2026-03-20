@@ -121,13 +121,13 @@ bool is_built_in(const std::string& command) noexcept {
 
 char** autocomplete(const char* text, int start, int end) {
   rl_attempted_completion_over = 1;
-  std::string match = CommandRegistry::autocomplete(text);
+  std::vector<std::string> match = CommandRegistry::autocomplete(text);
   if (match.empty()) return nullptr;
 
   char** arr = new char*[2];
   // converts the string to a heap allocated C string.
   // strdup does malloc + strcpy
-  arr[0] = strdup(match.c_str());
+  arr[0] = strdup(match[0].c_str());
   arr[1] = nullptr;
   return arr;
 }

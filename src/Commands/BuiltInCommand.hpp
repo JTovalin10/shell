@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Trie/Trie.hpp"
 #include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include "Trie/Trie.hpp"
 
 class BuiltInCommand {
  public:
@@ -39,7 +40,7 @@ class CommandRegistry {
     return map.find(name) != map.end();
   }
 
-  static std::string autocomplete(const char* word) {
+  static std::vector<std::string> autocomplete(const char* word) {
     return GetTrie().autocomplete(word);
   }
 

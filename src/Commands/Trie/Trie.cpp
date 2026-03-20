@@ -1,5 +1,6 @@
 #include "Trie.hpp"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -37,24 +38,26 @@ bool Trie::startsWith(const char* prefix) {
   return true;
 }
 
-std::string Trie::autocomplete(const char* prefix) {
+std::vector<std::string> Trie::autocomplete(const char* prefix) {
   TrieNode* tmp = &root;
   for (int i{}; prefix[i] != '\0'; ++i) {
-    if (!tmp->children.count(prefix[i])) return "";
+    if (!tmp->children.count(prefix[i])) return {};
     tmp = tmp->children[prefix[i]].get();
   }
+  std::vector<std::string> result{};
   std::string current{prefix};
-  return autocomplete_helper(tmp, current);
+  autocomplete_helper(tmp, current, result);
+  std::sort(result.begin(), result.end());
+  return result;
 }
 
-static std::string autocomplete_helper(TrieNode* node, std::string& current) {
-  if (node->end) return current;
+static void autocomplete_helper(TrieNode* node, std::string& current,
+                                std::vector<std::string>& result) {
+  if (node->end) result.push_back(current);
 
   for (auto& [ch, child] : node->children) {
     current.push_back(ch);
-    std::string result = autocomplete_helper(child.get(), current);
-    if (!result.empty()) return result;
+    autocomplete_helper(child.get(), current, result);
     current.pop_back();  // backtrack
   }
-  return "";
 }
