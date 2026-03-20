@@ -93,7 +93,7 @@ RedirectInfo find_redirect(std::vector<std::string>& args) {
     if ((args[i] == ">" || args[i] == "1>") && inbound) {
       info.stdout_file = args[i + 1];
       to_remove[STDOUT_IDX] = i;
-    } else if (args[i] == ">>" && inbound) {
+    } else if ((args[i] == ">>" || args[i] == "1>>") && inbound) {
       info.stdout_append_file = args[i + 1];
       to_remove[STDOUT_APPEND_IDX] = i;
     } else if (args[i] == "2>" && inbound) {
