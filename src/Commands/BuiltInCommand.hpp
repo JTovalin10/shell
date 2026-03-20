@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Trie/Trie.hpp>
+#include "Trie/Trie.hpp"
 #include <functional>
 #include <memory>
 #include <string>
