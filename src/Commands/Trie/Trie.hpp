@@ -1,7 +1,9 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 struct TrieNode {
   std::unordered_map<char, std::unique_ptr<TrieNode>> children{};

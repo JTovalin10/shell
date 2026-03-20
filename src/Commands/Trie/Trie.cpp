@@ -1,9 +1,6 @@
 #include "Trie.hpp"
 
 #include <algorithm>
-#include <string>
-#include <vector>
-
 /**
  * finds the first word and returns it
  */
