@@ -1,12 +1,12 @@
 #include "ShellHelper.hpp"
 
-#include "Commands/BuiltInCommand.hpp"
-
 #include <fcntl.h>
 #include <unistd.h>
 
 #include <algorithm>
 #include <cstddef>
+
+#include "Commands/BuiltInCommand.hpp"
 
 enum class STATE { NORMAL, SINGLE_QUOTE, DOUBLE_QUOTE, BACKSLASH };
 
@@ -169,15 +169,35 @@ bool is_built_in(const std::string& command) noexcept {
 
 char** autocomplete(const char* text, int start, int end) {
   rl_attempted_completion_over = 1;
+
+  // on first attempt make it ding
+  // all other attempts will become '\?'
+
   std::vector<std::string> match = AutoComplete::Run(text);
   if (match.empty()) return nullptr;
 
-  char** arr = new char*[2];
-  // converts the string to a heap allocated C string.
-  // strdup does malloc + strcpy
-  arr[0] = strdup(match[0].c_str());
-  arr[1] = nullptr;
-  return arr;
+  if (match.size() == 1) {
+    char** arr = new char*[2];
+    // converts the string to a heap allocated C string.
+    // strdup does malloc + strcpy
+    arr[0] = strdup(match[0].c_str());
+    arr[1] = nullptr;
+    return arr;
+  } else {
+    if (rl_completion_type == '\t') {
+      rl_ding();
+      return nullptr;
+    }
+    std::string result{};
+    for (int i{}; i < match.size(); ++i) {
+      if (i != 0) result += " ";
+      result += match[i];
+    }
+    fprintf(rl_outstream, "\n%s\n", result.c_str());
+    rl_on_new_line();
+    rl_redisplay();
+    return nullptr;
+  }
 }
 
 }  // namespace Slime
