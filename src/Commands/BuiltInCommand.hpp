@@ -6,7 +6,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "Trie/Trie.hpp"
+#include "../Trie/Trie.hpp"
+#include "AutoComplete.hpp"
 
 class BuiltInCommand {
  public:
@@ -21,7 +22,7 @@ class CommandRegistry {
  public:
   static void Add(std::unique_ptr<BuiltInCommand> cmd) {
     std::string name = cmd->Name();
-    GetTrie().insert(name.c_str());
+    AutoComplete::Add(name);
     GetMap()[name] = std::move(cmd);
   }
 
@@ -40,20 +41,11 @@ class CommandRegistry {
     return map.find(name) != map.end();
   }
 
-  static std::vector<std::string> autocomplete(const char* word) {
-    return GetTrie().autocomplete(word);
-  }
-
  private:
   static std::unordered_map<std::string, std::unique_ptr<BuiltInCommand>>&
   GetMap() {
     static std::unordered_map<std::string, std::unique_ptr<BuiltInCommand>>
         instance;
-    return instance;
-  }
-
-  static Trie& GetTrie() {
-    static Trie instance{};
     return instance;
   }
 };

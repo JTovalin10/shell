@@ -2,42 +2,15 @@
 
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
 
 #include <functional>
 #include <ranges>
-#include <string>
-#include <vector>
 
+#include "AutoComplete.hpp"
 #include "Commands/BuiltInCommand.hpp"
 #include "ShellHelper/ShellHelper.hpp"
 
 namespace Slime {
-
-static void redirect_stdout(const std::string& file) {
-  int fd = open(file.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644);
-  dup2(fd, STDOUT_FILENO);
-  close(fd);
-}
-
-static void append_stdout(const std::string& file) {
-  int fd = open(file.c_str(), O_WRONLY | O_APPEND | O_CREAT, 0644);
-  dup2(fd, STDOUT_FILENO);
-  close(fd);
-}
-
-static void redirect_stderr(const std::string& file) {
-  int fd = open(file.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644);
-  dup2(fd, STDERR_FILENO);
-  close(fd);
-}
-
-static void append_stderr(const std::string& file) {
-  int fd = open(file.c_str(), O_WRONLY | O_APPEND | O_CREAT, 0644);
-  dup2(fd, STDERR_FILENO);
-  close(fd);
-}
 
 static void fork_and_run(std::function<void()> child_fn) {
   pid_t pid = fork();
@@ -62,16 +35,9 @@ static void run_external(const std::vector<std::string>& inputs) {
 
 void execb(std::vector<std::string>& inputs) {
   Slime::RedirectInfo redirect = Slime::find_redirect(inputs);
-  const bool err_not_empty = !redirect.stderr_file.empty();
-  const bool out_not_empty = !redirect.stdout_file.empty();
-  const bool aout_not_empty = !redirect.stdout_append_file.empty();
-  const bool aerr_not_empty = !redirect.stderr_append_file.empty();
-  if (err_not_empty || out_not_empty || aout_not_empty) {
+  if (redirect.has_any()) {
     fork_and_run([&] {
-      if (err_not_empty) redirect_stderr(redirect.stderr_file);
-      if (out_not_empty) redirect_stdout(redirect.stdout_file);
-      if (aout_not_empty) append_stdout(redirect.stdout_append_file);
-      if (aerr_not_empty) append_stderr(redirect.stderr_append_file);
+      redirect.apply();
       CommandRegistry::Run(inputs[0], inputs);
     });
   } else {
@@ -82,14 +48,7 @@ void execb(std::vector<std::string>& inputs) {
 void execnb(std::vector<std::string>& inputs) {
   Slime::RedirectInfo redirect = Slime::find_redirect(inputs);
   fork_and_run([&] {
-    const bool err_not_empty = !redirect.stderr_file.empty();
-    const bool out_not_empty = !redirect.stdout_file.empty();
-    const bool aout_not_empty = !redirect.stdout_append_file.empty();
-    const bool aerr_not_empty = !redirect.stderr_append_file.empty();
-    if (err_not_empty) redirect_stderr(redirect.stderr_file);
-    if (out_not_empty) redirect_stdout(redirect.stdout_file);
-    if (aout_not_empty) append_stdout(redirect.stdout_append_file);
-    if (aerr_not_empty) append_stderr(redirect.stderr_append_file);
+    redirect.apply();
     run_external(inputs);
   });
 }
@@ -137,6 +96,20 @@ std::string find_in_file_system(const std::string& command) noexcept {
   char* path = std::getenv("PATH");
   // base case
   return find_in_path(command, path);
+}
+std::vector<std::string> find_all_execnb() {
+  std::vector<std::string> commands{};
+  const char* path = std::getenv("PATH");
+  for (const auto& dir : get_directories(path)) {
+    if (!fs::is_directory(dir)) continue;
+    for (const auto& dir_entry : fs::recursive_directory_iterator(dir)) {
+      if (!fs::is_regular_file(dir_entry) || fs::is_symlink(dir_entry))
+        continue;
+      if (!check_file_permission_status(dir_entry)) continue;
+      commands.push_back(dir_entry.path().filename().string());
+    }
+  }
+  return commands;
 }
 
 }  // namespace Slime

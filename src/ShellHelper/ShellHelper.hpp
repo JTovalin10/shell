@@ -2,16 +2,23 @@
 
 #include <readline/readline.h>
 
+#include <cstdio>
 #include <string>
 #include <vector>
+
+#include "Commands/AutoComplete.hpp"
+#include "FileSys/FileSys.hpp"
 
 namespace Slime {
 
 struct RedirectInfo {
   std::string stdout_file;
-  std::string stderr_append_file;
+  std::string astdout_file;
   std::string stderr_file;
-  std::string stdout_append_file;
+  std::string astderr_file;
+
+  void apply() const;
+  bool has_any() const;
 };
 
 /**
@@ -64,3 +71,12 @@ bool is_built_in(const std::string& command) noexcept;
  */
 char** autocomplete(const char* text, int start, int end);
 };  // namespace Slime
+
+static bool executed = []() {
+  std::vector<std::string> cmds = Slime::find_all_execnb();
+
+  for (const auto& cmd : cmds) {
+    AutoComplete::Add(cmd);
+  }
+  return true;
+}();

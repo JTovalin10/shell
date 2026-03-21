@@ -86,4 +86,6 @@ bool is_executable(const std::string& command);
  */
 std::string find_in_file_system(const std::string& command) noexcept;
 
+std::vector<std::string> find_all_execnb();
+
 }  // namespace Slime

@@ -1,9 +1,10 @@
 #include "ShellHelper.hpp"
 
+#include <fcntl.h>
+#include <unistd.h>
+
 #include <algorithm>
 #include <cstddef>
-
-#include "Commands/BuiltInCommand.hpp"
 
 enum class STATE { NORMAL, SINGLE_QUOTE, DOUBLE_QUOTE, BACKSLASH };
 
@@ -19,7 +20,52 @@ static constexpr int STDERR_IDX{2};
 static constexpr int STDERR_APPEND_IDX{3};
 }  // namespace SLIME_UTILS
 
+static void redirect_stdout(const std::string& file) {
+  int fd = open(file.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644);
+  dup2(fd, STDOUT_FILENO);
+  close(fd);
+}
+
+static void append_stdout(const std::string& file) {
+  int fd = open(file.c_str(), O_WRONLY | O_APPEND | O_CREAT, 0644);
+  dup2(fd, STDOUT_FILENO);
+  close(fd);
+}
+
+static void redirect_stderr(const std::string& file) {
+  int fd = open(file.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644);
+  dup2(fd, STDERR_FILENO);
+  close(fd);
+}
+
+static void append_stderr(const std::string& file) {
+  int fd = open(file.c_str(), O_WRONLY | O_APPEND | O_CREAT, 0644);
+  dup2(fd, STDERR_FILENO);
+  close(fd);
+}
+
+using RedirectFn = void (*)(const std::string&);
+using Entry = std::pair<const std::string&, RedirectFn>;
+
 namespace Slime {
+
+void RedirectInfo::apply() const {
+  const Entry actions[] = {
+      {stdout_file, redirect_stdout},
+      {astdout_file, append_stdout},
+      {stderr_file, redirect_stderr},
+      {astderr_file, append_stderr},
+  };
+  for (const auto& [file, fn] : actions) {
+    if (!file.empty()) fn(file);
+  }
+}
+
+bool RedirectInfo::has_any() const {
+  return !stdout_file.empty() || !astdout_file.empty() ||
+         !stderr_file.empty() || !astderr_file.empty();
+}
+
 std::vector<std::string> parse_args(const std::string& user_args) {
   STATE state = STATE::NORMAL;
   std::vector<std::string> parsed_args{};
@@ -96,13 +142,13 @@ RedirectInfo find_redirect(std::vector<std::string>& args) {
       info.stdout_file = args[i + 1];
       to_remove[SLIME_UTILS::STDOUT_IDX] = i;
     } else if ((args[i] == ">>" || args[i] == "1>>") && inbound) {
-      info.stdout_append_file = args[i + 1];
+      info.astdout_file = args[i + 1];
       to_remove[SLIME_UTILS::STDOUT_APPEND_IDX] = i;
     } else if (args[i] == "2>" && inbound) {
       info.stderr_file = args[i + 1];
       to_remove[SLIME_UTILS::STDERR_IDX] = i;
     } else if (args[i] == "2>>" && inbound) {
-      info.stderr_append_file = args[i + 1];
+      info.astderr_file = args[i + 1];
       to_remove[SLIME_UTILS::STDERR_APPEND_IDX] = i;
     }
   }
@@ -121,7 +167,7 @@ bool is_built_in(const std::string& command) noexcept {
 
 char** autocomplete(const char* text, int start, int end) {
   rl_attempted_completion_over = 1;
-  std::vector<std::string> match = CommandRegistry::autocomplete(text);
+  std::vector<std::string> match = AutoComplete::Run(text);
   if (match.empty()) return nullptr;
 
   char** arr = new char*[2];
