@@ -115,7 +115,7 @@ std::vector<std::string> find_all_execnb() {
 void insert_files_in_trie() {
   for (const auto& file : fs::recursive_directory_iterator(".")) {
     FileAutoComplete::Add(file.path().filename().string());
-    FileAutoComplete::Add(file.path().string());
+    FileAutoComplete::Add(file.path().relative_path().string());
   }
 }
 
