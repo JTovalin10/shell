@@ -197,7 +197,13 @@ static std::string longest_common_prefix(std::vector<std::string> matches) {
 
 char** autocomplete(const char* text, int start, int end) {
   rl_attempted_completion_over = 1;
-  std::vector<std::string> match = AutoComplete::Run(text);
+  std::vector<std::string> commands = AutoComplete::Run(text);
+  std::vector<std::string> files = FileAutoComplete::Run(text);
+  std::vector<std::string> match(commands.size() + files.size());
+
+  std::merge(commands.begin(), commands.end(), files.begin(), files.end(),
+             match.begin());
+
   if (match.empty()) return nullptr;
 
   std::string result = match[0];

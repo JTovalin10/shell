@@ -59,3 +59,5 @@ static void autocomplete_helper(TrieNode* node, std::string& current,
     current.pop_back();  // backtrack
   }
 }
+
+void Trie::clear() { root = TrieNode{}; }

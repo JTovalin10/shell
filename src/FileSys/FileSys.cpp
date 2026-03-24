@@ -6,6 +6,10 @@
 #include <functional>
 #include <ranges>
 
+#include "Commands/BuiltInCommand.hpp"
+
+namespace fs = std::filesystem;
+
 namespace Slime {
 
 static void fork_and_run(std::function<void()> child_fn) {
@@ -106,6 +110,12 @@ std::vector<std::string> find_all_execnb() {
     }
   }
   return commands;
+}
+
+void insert_files_in_trie() {
+  for (const auto& file : fs::recursive_directory_iterator(".")) {
+    FileAutoComplete::Add(file.path().filename().string());
+  }
 }
 
 }  // namespace Slime

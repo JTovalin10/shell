@@ -31,7 +31,7 @@ int main() {
   std::cerr << std::unitbuf;
 
   rl_attempted_completion_function = Slime::autocomplete;
-
+  Slime::insert_files_in_trie();
   std::string user_input{};
   while (true) {
     char* input = readline("$ ");

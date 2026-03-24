@@ -56,6 +56,11 @@ class Trie {
    */
   std::vector<std::string> autocomplete(const char* word);
 
+  /**
+   * Resets the trie to be populated again
+   */
+  void clear();
+
  private:
   TrieNode root;
 };

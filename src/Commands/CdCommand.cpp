@@ -16,6 +16,8 @@ class CdCommand : public BuiltInCommand {
     if (fs::exists(desired_path) && fs::is_directory(desired_path)) {
       try {
         fs::current_path(desired_path);
+        FileAutoComplete::Clear();
+        // loop through the file and add all new files into the trie
       } catch (const fs::filesystem_error& e) {
         // asumes the path is correct
         std::cerr << "cd: " << desired_path << ": No such file or directory\n";

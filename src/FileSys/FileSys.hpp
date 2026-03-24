@@ -11,8 +11,6 @@
 #include "Commands/BuiltInCommand.hpp"
 #include "ShellHelper/ShellHelper.hpp"
 
-namespace fs = std::filesystem;
-
 namespace Slime {
 
 /**
@@ -52,7 +50,7 @@ std::vector<std::string> get_directories(const char* char_path);
  * true - the user has permission to use the file
  * false - the user doesnt have permission to use the file
  */
-bool check_file_permission_status(const fs::path& path);
+bool check_file_permission_status(const std::filesystem::path& path);
 
 /**
  * checks where the given command is within the given path (sub-paths), also
@@ -91,5 +89,7 @@ bool is_executable(const std::string& command);
 std::string find_in_file_system(const std::string& command) noexcept;
 
 std::vector<std::string> find_all_execnb();
+
+void insert_files_in_trie();
 
 }  // namespace Slime
