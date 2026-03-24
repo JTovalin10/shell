@@ -237,6 +237,8 @@ char** autocomplete(const char* text, int start, int end) {
   } else {
     rl_completion_append_character = ' ';
   }
+  rl_completion_append_character =
+      (!result.empty() && result.back() == '/') ? '\0' : ' ';
 
   char** arr = new char*[2];
   arr[0] = strdup(result.c_str());
