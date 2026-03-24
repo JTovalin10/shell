@@ -238,11 +238,8 @@ char** autocomplete(const char* text, int start, int end) {
       return nullptr;
     }
   } else {
-    rl_completion_append_character = ' ';
-  }
-  if (start > 0) {
     rl_completion_append_character =
-        (!result.empty() && result.back() == '/') ? '\0' : ' ';
+        (start > 0 && !result.empty() && result.back() == '/') ? '\0' : ' ';
   }
 
   char** arr = new char*[2];
