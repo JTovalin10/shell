@@ -211,7 +211,7 @@ char** autocomplete(const char* text, int start, int end) {
       auto it = std::find(match.begin(), match.end(), std::string(text));
       if (it != match.end() && match.size() > 1) {
         match.erase(it);
-        result = match.size() == 1 ? match[0] : longest_common_prefix(match);
+        result = (match.size() == 1) ? match[0] : longest_common_prefix(match);
       }
     }
     if (result == std::string(text)) {
