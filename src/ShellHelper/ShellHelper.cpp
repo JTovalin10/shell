@@ -207,6 +207,14 @@ char** autocomplete(const char* text, int start, int end) {
     result = longest_common_prefix(match);
     rl_completion_append_character = '\0';
     if (result == std::string(text)) {
+      // retry: strip exact match and recompute if there are extending matches
+      auto it = std::find(match.begin(), match.end(), std::string(text));
+      if (it != match.end() && match.size() > 1) {
+        match.erase(it);
+        result = match.size() == 1 ? match[0] : longest_common_prefix(match);
+      }
+    }
+    if (result == std::string(text)) {
       static std::string last_ding_text;
       if (last_ding_text == std::string(text)) {
         // second TAB: display all completions
