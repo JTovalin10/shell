@@ -49,7 +49,7 @@ void History::print(const int n) {
   }
 
   for (int i = num; list && list[i]; ++i) {
-    std::cout << "    " << i + 1 << " " << list[i]->line << '\n';
+    std::cout << "    " << i + 1 << "  " << list[i]->line << '\n';
   }
   // n is up to n
 }
