@@ -48,8 +48,6 @@ int main() {
     }
 
     Slime::get_history().add(user_input);
-
-    if (user_input.empty()) continue;  // this shouldnt happen
     if (user_input == "exit") break;
 
     complete_operation(user_input);
