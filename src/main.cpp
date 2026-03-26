@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "FileSys/FileSys.hpp"
+#include "ShellHelper/History.hpp"
 #include "ShellHelper/ShellHelper.hpp"
 
 /**
@@ -29,19 +30,26 @@ int main() {
   std::cerr << std::unitbuf;
 
   rl_attempted_completion_function = Slime::autocomplete;
-  // rl_completer_word_break_characters = (char*)" \t\n\"'@><=;|&{(";
   Slime::insert_files_in_trie();
   std::string user_input{};
   while (true) {
     char* input = readline("$ ");
+
+    if (!input) continue;
+
+    if (*input == '\0') {
+      free(input);
+      continue;
+    }
+
     if (input) {
       user_input = input;
       free(input);
     }
 
-    if (!input) break;
+    Slime::get_history().add(user_input);
 
-    if (user_input.empty()) continue;
+    if (user_input.empty()) continue;  // this shouldnt happen
     if (user_input == "exit") break;
 
     complete_operation(user_input);
