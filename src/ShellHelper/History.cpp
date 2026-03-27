@@ -14,11 +14,11 @@ History::History(const std::string& hist_file, const int max_entries)
 
 History::~History() { save(); }
 
-void History::save() {
+void History::save(const std::string& file) {
   // saves history to the file
-  const char* file = g_hist_file.c_str();
-  write_history(file);
-  history_truncate_file(file, g_max_entries);
+  const char* cfile = file.c_str();
+  write_history(cfile);
+  history_truncate_file(cfile, g_max_entries);
 }
 
 void History::remove(int n) {

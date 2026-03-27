@@ -26,7 +26,7 @@ class History {
   /**
    * Saves the current history to file
    */
-  void save();
+  void save(const std::string& file = get_history_file());
 
   /**
    * removes entry n, if it exists
