@@ -61,7 +61,7 @@ class History {
   }
 };
 
-static History& get_history() {
+inline History& get_history() {
   static History instance{};
   return instance;
 }
