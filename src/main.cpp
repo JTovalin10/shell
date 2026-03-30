@@ -14,7 +14,7 @@
  * ARGS:
  * user_input - string that contains the user input
  */
-void complete_operation(const std::string& user_input) noexcept {
+void complete_operation(const std::string& user_input) {
   std::vector<std::string> inputs = Slime::parse_args(user_input);
   std::string command = inputs[0];
   if (Slime::is_built_in(command) || Slime::is_executable(command)) {
